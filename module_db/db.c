@@ -183,10 +183,10 @@ entry_course *course_select(int id)
     ret->next = NULL;
     char sql[1024] = {0};
     sprintf(sql, "select * from tb_course where id=%d;", id);
-    char **errmsg;
-    if (SQLITE_OK != sqlite3_exec(sql_db, sql, course_query_callback, ret, errmsg))
+    // char **errmsg;
+    if (SQLITE_OK != sqlite3_exec(sql_db, sql, course_query_callback, ret, NULL))
     {
-        fprintf(stderr, "%s\n", *errmsg);
+        // fprintf(stderr, "%s\n", *errmsg);
         return NULL;
     }
     return ret->next; // TODO need free()
@@ -294,7 +294,7 @@ int main(void)
     course->name = "连接超时";
     course_edit(645, course);
 
-    entry_course *data = course_select_all();
+    entry_course *data = course_select(659944);
     while (data != NULL)
     {
         printf("course: id(%d), name('%s'), type('%s'), hours(%d), credit(%.1f), students_limit(%d)\n",
