@@ -31,6 +31,22 @@ typedef struct entry_selection
 } entry_selection;
 
 int db_open(const char *db_path);
+int db_init_table();
 void db_close();
+
+int student_insert(int id, const char *name);
+entry_student *student_select();
+int student_edit(int id, entry_student *data);
+int student_delete(int id);
+
+int course_insert(entry_course *course);
+int course_delete(int id);
+int course_edit(int id, entry_course *course);
+entry_course *course_select(int id);
+entry_course *course_select_all();
+
+int selection_insert(entry_selection *selection);
+int selection_delete(int stu_id, int course_id);
+entry_selection *selection_find_course(int course_id);
 
 #endif //MYPROJECT_DB_H
