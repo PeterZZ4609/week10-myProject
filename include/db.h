@@ -18,7 +18,7 @@ typedef struct entry_course
     char *name;
     char *type;
     int hours;
-    int credit;
+    double credit;
     int students_limit;
     struct entry_course *next;
 } entry_course;

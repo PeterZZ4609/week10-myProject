@@ -81,7 +81,7 @@ entry_student *student_select()
     ret->next = NULL;
     char sql[1024] = "select * from tb_student;";
     char **errmsg;
-    if (sqlite3_exec(sql_db, sql, student_query_callback, ret, NULL) != 0)
+    if (SQLITE_OK != sqlite3_exec(sql_db, sql, student_query_callback, ret, NULL))
     {
         fprintf(stderr, "%s\n", *errmsg);
         return NULL;
@@ -118,8 +118,8 @@ int student_delete(int id)
  */
 int course_insert(entry_course *course)
 {
-    char sql[2014] = {0};
-    sprintf(sql, "insert into tb_course values(%d, '%s', '%s', %d, %d, %d);",
+    char sql[1024] = {0};
+    sprintf(sql, "insert into tb_course values(%d, '%s', '%s', %d, %.1f, %d);",
             course->id, course->name, course->type, course->hours, course->credit, course->students_limit);
     return SQLITE_OK == sqlite3_exec(sql_db, sql, NULL, NULL, NULL);
 }
@@ -135,35 +135,36 @@ int course_edit(int id, entry_course *course)
 {
     char sql[1024] = {0};
     // id may not exists
-    sprintf(sql, "update tb_course set id=%d, name='%s', type='%s', hours=%d, credit=%d, students_limit=%d;",
-            course->id, course->name, course->type, course->hours, course->credit, course->students_limit);
+    sprintf(sql, "update tb_course set id=%d, name='%s', type='%s', hours=%d, credit=%.1f, students_limit=%d where id=%d;",
+            course->id, course->name, course->type, course->hours, course->credit, course->students_limit, id);
     return SQLITE_OK == sqlite3_exec(sql_db, sql, NULL, NULL, NULL);
 }
 
 static int course_query_callback(void *ret, int s, char **data, char **column_names)
 {
+    entry_course *now = (entry_course *)ret;
+    while (now->next != NULL)
+        now = now->next;
     entry_course *res = (entry_course *)malloc(sizeof(entry_course));
     res->next = NULL;
-    res->id = atoi(data[0]);
     // columns may not stay the right order
     int i = 0;
-    while (i < s)
+    while (i++ < s)
     {
-        if (strcmp(column_names[i], "id"))
+        if (strcmp(column_names[i], "id") == 0)
             res->id = atoi(data[i]);
-        else if (strcmp(column_names[i], "name"))
+        else if (strcmp(column_names[i], "name") == 0)
             res->name = data[i];
-        else if (strcmp(column_names[i], "type"))
+        else if (strcmp(column_names[i], "type") == 0)
             res->type = data[i];
-        else if (strcmp(column_names[i], "hours"))
+        else if (strcmp(column_names[i], "hours") == 0)
             res->hours = atoi(data[i]);
-        else if (strcmp(column_names[i], "credit"))
-            res->credit = atoi(data[i]);
-        else if (strcmp(column_names[i], "students_limit"))
+        else if (strcmp(column_names[i], "credit") == 0)
+            res->credit = atof(data[i]);
+        else if (strcmp(column_names[i], "students_limit") == 0)
             res->students_limit = atoi(data[i]);
-        ++i;
     }
-    ((entry_course *)ret)->next = res;
+    now->next = res;
     return 0;
 }
 
@@ -184,17 +185,16 @@ entry_course *course_select(int id)
 
 entry_course *course_select_all()
 {
-    entry_course *ret = (entry_course *)malloc(sizeof(entry_course));
-    ret->next = NULL;
-    char sql[1024] = {0};
-    sprintf(sql, "select * from tb_course;");
-    char **errmsg;
-    if (SQLITE_OK != sqlite3_exec(sql_db, sql, course_query_callback, ret, errmsg))
+    entry_course *res = (entry_course *)malloc(sizeof(entry_course));
+    res->next = NULL;
+    char sql[1024] = "select * from tb_course;";
+    // char *errmsg = (char *)malloc(sizeof(char) * 1024);
+    if (SQLITE_OK != sqlite3_exec(sql_db, sql, course_query_callback, res, NULL))
     {
-        fprintf(stderr, "%s\n", *errmsg);
+        // fprintf(stderr, "Error: %s\n", errmsg);
         return NULL;
     }
-    return ret->next; // TODO need free()
+    return res->next; // TODO need free()
 }
 
 /**
@@ -261,36 +261,40 @@ int main(void)
     student_insert(12, "PeterZhang"); // Must fail
     puts("");
 
-    entry_student *ret = student_select();
-    printf("select_student():\n");
-    while (ret != NULL)
+    puts("Insert courses...");
+    entry_course *course = (entry_course *)malloc(sizeof(entry_course));
+    course->id = 1123;
+    course->name = "123123123123";
+    course->type = "gongxuanke";
+    course->hours = 48;
+    course->credit = 4.5;
+    course->students_limit = 120;
+    course_insert(course);
+    course->id = 3543;
+    course_insert(course);
+    course->id = 2534;
+    course_insert(course);
+    course->id = 645;
+    course_insert(course);
+    course->id = 74664;
+    course_insert(course);
+
+    course_delete(74664);
+    course_delete(10);
+    course->id = 659944;
+    course->name = "连接超时";
+    course_edit(645, course);
+
+    entry_course *data = course_select_all();
+    while (data != NULL)
     {
-        printf("%d: %s (%lu)\n", ret->id, ret->name, strlen(ret->name));
-        ret = ret->next;
+        printf("course: id(%d), name('%s'), type('%s'), hours(%d), credit(%.1f), students_limit(%d)\n",
+               data->id, data->name, data->type, data->hours, data->credit, data->students_limit);
+        data = data->next;
     }
     puts("");
 
-    entry_student a;
-    a.id = 88;
-    a.name = "PeterZhang";
-    a.next = NULL;
-
-    printf("%d\n", student_edit(12, &a));
-    ret = student_select();
-    while (ret != NULL)
-    {
-        printf("%d: %s (%lu)\n", ret->id, ret->name, strlen(ret->name));
-        ret = ret->next;
-    }
-    puts("");
-
-    printf("%d\n", student_delete(88));
-    ret = student_select();
-    while (ret != NULL)
-    {
-        printf("%d: %s (%lu)\n", ret->id, ret->name, strlen(ret->name));
-        ret = ret->next;
-    }
+    db_close();
 
     return 0;
 }
