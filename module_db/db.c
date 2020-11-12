@@ -149,20 +149,29 @@ static int course_query_callback(void *ret, int s, char **data, char **column_na
     res->next = NULL;
     // columns may not stay the right order
     int i = 0;
-    while (i++ < s)
+    while (i < s)
     {
         if (strcmp(column_names[i], "id") == 0)
             res->id = atoi(data[i]);
         else if (strcmp(column_names[i], "name") == 0)
-            res->name = data[i];
+        {
+            char *name = malloc(1024);
+            strcpy(name, data[i]);
+            res->name = name;
+        }
         else if (strcmp(column_names[i], "type") == 0)
-            res->type = data[i];
+        {
+            char *type = malloc(1024);
+            strcpy(type, data[i]);
+            res->type = type;
+        }
         else if (strcmp(column_names[i], "hours") == 0)
             res->hours = atoi(data[i]);
         else if (strcmp(column_names[i], "credit") == 0)
             res->credit = atof(data[i]);
         else if (strcmp(column_names[i], "students_limit") == 0)
             res->students_limit = atoi(data[i]);
+        ++i;
     }
     now->next = res;
     return 0;
@@ -215,7 +224,7 @@ int selection_delete(int stu_id, int course_id)
     return SQLITE_OK == sqlite3_exec(sql_db, sql, NULL, NULL, NULL);
 }
 
-int selection_query_callback(void *ret, int s, char **data, char **column_names)
+static int selection_query_callback(void *ret, int s, char **data, char **column_names)
 {
     entry_selection *res = (entry_selection *)malloc(sizeof(entry_selection));
     res->next = NULL;
