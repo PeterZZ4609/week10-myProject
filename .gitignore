@@ -3,3 +3,6 @@ cmake-build-debug
 CMakeLists.txt
 sqlite-autoconf-3330000
 module*/.*
+module*/*.db
+module*/*.o
+module*/*.out
