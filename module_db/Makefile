@@ -15,6 +15,6 @@ test: db.o sqlite3.o
 	./test.out
 
 clean:
-	rm -rf *.out *.db
+	rm -rf *.out *.db *.o
 
 .PHONY: clean
