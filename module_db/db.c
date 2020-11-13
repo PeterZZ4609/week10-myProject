@@ -234,12 +234,12 @@ static int selection_query_callback(void *ret, int s, char **data, char **column
     return 0;
 }
 
-entry_selection *selection_find_course(int course_id)
+static entry_selection *selection_find(int id, const char *type)
 {
     char sql[1024] = {0};
     entry_selection *res = (entry_selection *)malloc(sizeof(entry_selection));
     res->next = NULL;
-    sprintf(sql, "select * from tb_selection where course_id=%d;", course_id);
+    sprintf(sql, "select * from tb_selection where %s_id=%d;", type, id);
     char **errmsg;
     if (SQLITE_OK != sqlite3_exec(sql_db, sql, selection_query_callback, res, errmsg))
     {
@@ -247,6 +247,16 @@ entry_selection *selection_find_course(int course_id)
         return NULL;
     }
     return res->next; // TODO need free()
+}
+
+entry_selection *selection_find_course(int course_id)
+{
+    return selection_find(course_id, "course");
+}
+
+entry_selection *selection_find_student(int stu_id)
+{
+    return selection_find(stu_id, "stu");
 }
 
 void db_close()

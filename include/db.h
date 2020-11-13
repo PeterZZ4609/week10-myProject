@@ -48,5 +48,6 @@ entry_course *course_select_all();
 int selection_insert(entry_selection *selection);
 int selection_delete(int stu_id, int course_id);
 entry_selection *selection_find_course(int course_id);
+entry_selection *selection_find_student(int stu_id);
 
 #endif //MYPROJECT_DB_H
