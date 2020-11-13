@@ -36,6 +36,7 @@ void db_close();
 
 int student_insert(int id, const char *name);
 entry_student *student_select();
+entry_student *student_select_by_id(int id);
 int student_edit(int id, entry_student *data);
 int student_delete(int id);
 

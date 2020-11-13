@@ -89,6 +89,21 @@ entry_student *student_select()
     return ret->next; // need free()
 }
 
+entry_student *student_select_by_id(int id)
+{
+    entry_student *ret = (entry_student *)malloc(sizeof(entry_student)); // It is linking table's head without data
+    ret->next = NULL;
+    char sql[1024];
+    sprintf(sql, "select * from tb_student where id=%d;", id);
+    char **errmsg;
+    if (SQLITE_OK != sqlite3_exec(sql_db, sql, student_query_callback, ret, NULL))
+    {
+        fprintf(stderr, "%s\n", *errmsg);
+        return NULL;
+    }
+    return ret->next; // need free()
+}
+
 /**
  * Return 1 if success
  */
