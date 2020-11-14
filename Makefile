@@ -14,5 +14,5 @@ main.o: main.c
 	$(cc) -c -o $@ $^
 
 clean:
-	rm -f lib/*
+	rm -f lib/* *.o *.db
 	for dir in module_db module_student module_course; do $(MAKE) -C $$dir clean || exit 1; done
