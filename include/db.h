@@ -32,6 +32,7 @@ typedef struct entry_selection
 
 int db_open(const char *db_path);
 int db_init_table();
+int db_init_table();
 void db_close();
 
 int student_insert(int id, const char *name);
