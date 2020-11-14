@@ -9,7 +9,9 @@ int add_student(student_info *info)
 }
 student_info *get_all_students_info()
 {
+    // puts("s1");
     entry_student *entries = student_select();
+    // puts("s1.end");
     if (entries)
     {
         student_info *students = (student_info *)malloc(sizeof(student_info));

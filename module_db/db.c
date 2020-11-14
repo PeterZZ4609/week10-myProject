@@ -280,7 +280,7 @@ void db_close()
         sqlite3_close(sql_db);
 }
 
-int main(void)
+int main2(void)
 {
     db_open("./test.db");
 

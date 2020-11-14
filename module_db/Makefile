@@ -1,13 +1,15 @@
-all: libdb.a
+cc=gcc -I../include
 
-libdb.a: sqlite3.o db.o
-	ar rcs $@ $^
+all: lib_db.a
 
-db.o: db.c
-	gcc -c db.c -o $@ -I../include
+lib_db.a: sqlite3.o db.o
+	ar rcs ../lib/$@ $^
 
 sqlite3.o: sqlite3.c
-	gcc -c $^ -o $@
+	$(cc) -c -o $@ $^ -ldl -lpthread -static
+
+db.o: db.c
+	$(cc) -c -o $@ $^
 
 test: db.o sqlite3.o
 	gcc $^ -o test.out -ldl -lpthread

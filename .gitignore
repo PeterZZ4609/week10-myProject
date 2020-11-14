@@ -3,4 +3,8 @@ sqlite-autoconf-3330000
 *.db
 *.o
 *.out
+*.mk
+lib
 back
+curses_learning
+main
