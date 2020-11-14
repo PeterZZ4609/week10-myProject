@@ -39,6 +39,58 @@ int db_init_table()
     return ret; // If not 0, failed
 }
 
+static entry_course *new_entry_course(int id, char *name, char *type, int hours, double credit, int students_limit)
+{
+    entry_course *c = (entry_course *)malloc(sizeof(entry_course));
+    c->next = NULL;
+
+    c->id = id;
+    c->name = name;
+    char *tmp = malloc(strlen(name) + 1);
+    strcpy(tmp, name);
+    c->name = tmp;
+    tmp = malloc(strlen(type));
+    strcpy(tmp, type);
+    c->type = tmp;
+    tmp = NULL;
+    c->hours = hours;
+    c->credit = credit;
+    c->students_limit = student_insert;
+    return c;
+}
+
+static entry_selection *new_entry_selection(int stu_id, int course_id)
+{
+    entry_selection *s = (entry_selection *)malloc(sizeof(entry_selection));
+    s->next = NULL;
+    s->stu_id = stu_id;
+    s->course_id = course_id;
+    return s;
+}
+
+int db_init_mockdata()
+{
+    student_insert(12, "张三");
+    student_insert(13, "李丢丢");
+    student_insert(14, "王麻麻");
+    student_insert(16, "赵子云");
+    student_insert(18, "宋捶捶");
+    course_insert(new_entry_course(45, "操作系统", "公选课", 32, 2, 120));
+    course_insert(new_entry_course(48, "计算机网络基础", "限选课", 48, 4.5, 60));
+    course_insert(new_entry_course(129, "C语言现代方法", "选修课", 32, 3.5, 120));
+    selection_insert(new_entry_selection(12, 48));
+    selection_insert(new_entry_selection(12, 45));
+    selection_insert(new_entry_selection(13, 45));
+    selection_insert(new_entry_selection(13, 129));
+    selection_insert(new_entry_selection(14, 45));
+    selection_insert(new_entry_selection(16, 129));
+    selection_insert(new_entry_selection(18, 45));
+    selection_insert(new_entry_selection(18, 48));
+    selection_insert(new_entry_selection(18, 129));
+
+    return 1;
+}
+
 /**
  * Operations API for tb_student.
  */
@@ -285,48 +337,8 @@ int main2(void)
     db_open("./test.db");
 
     db_init_table();
-    puts("");
 
-    puts("Insert students...");
-    student_insert(12, "Peter");
-    student_insert(13, "Annie");
-    student_insert(14, "Johnson");
-    student_insert(15, "Linus");
-    student_insert(12, "PeterZhang"); // Must fail
-    puts("");
-
-    puts("Insert courses...");
-    entry_course *course = (entry_course *)malloc(sizeof(entry_course));
-    course->id = 1123;
-    course->name = "123123123123";
-    course->type = "gongxuanke";
-    course->hours = 48;
-    course->credit = 4.5;
-    course->students_limit = 120;
-    course_insert(course);
-    course->id = 3543;
-    course_insert(course);
-    course->id = 2534;
-    course_insert(course);
-    course->id = 645;
-    course_insert(course);
-    course->id = 74664;
-    course_insert(course);
-
-    course_delete(74664);
-    course_delete(10);
-    course->id = 659944;
-    course->name = "连接超时";
-    course_edit(645, course);
-
-    entry_course *data = course_select(659944);
-    while (data != NULL)
-    {
-        printf("course: id(%d), name('%s'), type('%s'), hours(%d), credit(%.1f), students_limit(%d)\n",
-               data->id, data->name, data->type, data->hours, data->credit, data->students_limit);
-        data = data->next;
-    }
-    puts("");
+    db_init_mockdata();
 
     db_close();
 
