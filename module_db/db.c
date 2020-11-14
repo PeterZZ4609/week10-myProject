@@ -55,7 +55,7 @@ static entry_course *new_entry_course(int id, char *name, char *type, int hours,
     tmp = NULL;
     c->hours = hours;
     c->credit = credit;
-    c->students_limit = student_insert;
+    c->students_limit = students_limit;
     return c;
 }
 
