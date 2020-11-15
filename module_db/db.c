@@ -297,7 +297,10 @@ static int selection_query_callback(void *ret, int s, char **data, char **column
     res->next = NULL;
     res->stu_id = atoi(data[0]);
     res->course_id = atoi(data[1]);
-    ((entry_selection *)ret)->next = res;
+    entry_selection *now = (entry_selection *)ret;
+    while (now->next)
+        now = now->next;
+    now->next = res;
     return 0;
 }
 
@@ -307,10 +310,10 @@ static entry_selection *selection_find(int id, const char *type)
     entry_selection *res = (entry_selection *)malloc(sizeof(entry_selection));
     res->next = NULL;
     sprintf(sql, "select * from tb_selection where %s_id=%d;", type, id);
-    char **errmsg;
-    if (SQLITE_OK != sqlite3_exec(sql_db, sql, selection_query_callback, res, errmsg))
+    // char **errmsg;
+    if (SQLITE_OK != sqlite3_exec(sql_db, sql, selection_query_callback, res, NULL))
     {
-        fprintf(stderr, "%s\n", *errmsg);
+        // fprintf(stderr, "%s\n", *errmsg);
         return NULL;
     }
     return res->next; // TODO need free()

@@ -17,27 +17,37 @@ student_info *get_all_students_info()
         student_info *students = (student_info *)malloc(sizeof(student_info));
         students->next = NULL;
         student_info *now = students;
+        // puts("---");
         while (entries)
         {
+            // puts("start");
             student_info *this = (student_info *)malloc(sizeof(student_info));
             this->next = NULL;
             this->id = entries->id;
+            // char *tmp = malloc(strlen(entries->name) + 1);
+            // strcpy(tmp, entries->name);
             this->name = entries->name;
             // courses
             entry_selection *selections = selection_find_student(this->id);
+            // puts("end");
             if (selections)
             {
                 entry_course *courses = (entry_course *)malloc(sizeof(entry_course));
                 courses->next = NULL;
-                entry_course *now = courses;
+                entry_course *now2 = courses;
                 while (selections)
                 {
-                    entry_course *this = course_select(selections->course_id);
-                    now->next = this;
-                    now = now->next;
+                    entry_course *this2 = course_select(selections->course_id);
+                    now2->next = this2;
+                    now2 = now2->next;
                     selections = selections->next;
+                    // puts(now2->name);
                 }
-                students->courses = courses->next; // 需要free()之前的节点
+                this->courses = courses->next; // 需要free()之前的节点
+            }
+            else
+            {
+                this->courses = NULL;
             }
             //courses ok
             now->next = this;

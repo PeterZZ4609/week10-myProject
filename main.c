@@ -17,6 +17,7 @@ int main(void)
     // 初始化数据库
     db_open("./test.db");
     db_init_table();
+    db_init_mockdata();
     // 主循环
     while (1)
     {
@@ -56,8 +57,8 @@ char wait_option()
 
 void manage_student()
 {
-    // puts("1");
     puts(SPLINE_1);
+    // puts("1");
     student_info *all = get_all_students_info();
     student_info *iter = all;
     // puts("1.end");

@@ -1,8 +1,5 @@
 cc=gcc -I "./include"
 
-vpath %.o lib
-vpath %.a lib
-
 all: main
 
 main: main.o
@@ -14,5 +11,5 @@ main.o: main.c
 	$(cc) -c -o $@ $^
 
 clean:
-	rm -f lib/* *.o *.db
+	rm -f lib/*.o *.o *.db
 	for dir in module_db module_student module_course; do $(MAKE) -C $$dir clean || exit 1; done
