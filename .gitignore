@@ -1,0 +1,8 @@
+.*
+!.gitignore
+sqlite-autoconf-*
+main
+lib
+*.o
+*.a
+*.out
