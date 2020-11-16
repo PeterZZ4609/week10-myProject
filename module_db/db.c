@@ -249,6 +249,11 @@ entry_selection *selection_find_course(int course_id)
     return res->next; // TODO need free()
 }
 
+int db_exec(char *sql, int (*callback)(void *, int, char **, char **), void *argv1)
+{
+    return sqlite3_exec(sql_db, sql, callback, argv1, NULL);
+}
+
 void db_close()
 {
     if (NULL != sql_db)

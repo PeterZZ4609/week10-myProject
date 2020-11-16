@@ -4,3 +4,5 @@ sqlite-autoconf-3330000
 *.o
 *.out
 back
+lib
+main
