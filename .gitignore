@@ -6,3 +6,9 @@ lib
 *.o
 *.a
 *.out
+<<<<<<< HEAD
+=======
+back
+lib
+main
+>>>>>>> add_db_exec

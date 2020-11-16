@@ -329,6 +329,11 @@ entry_selection *selection_find_student(int stu_id)
     return selection_find(stu_id, "stu");
 }
 
+int db_exec(char *sql, int (*callback)(void *, int, char **, char **), void *argv1)
+{
+    return sqlite3_exec(sql_db, sql, callback, argv1, NULL);
+}
+
 void db_close()
 {
     if (NULL != sql_db)
