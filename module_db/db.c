@@ -33,7 +33,7 @@ int db_init_table()
     ret += sqlite3_exec(sql_db, sql, NULL, NULL, NULL);
     sprintf(sql, "create table if not exists tb_course( id integer primary key, name text not null, type text not null, hours integer, credit integer, students_limit integer);");
     ret += sqlite3_exec(sql_db, sql, NULL, NULL, NULL);
-    sprintf(sql, "create table if not exists tb_selection( stu_id integer , course_id integer )");
+    sprintf(sql, "create table if not exists tb_selection( stu_id integer , course_id integer, primary key ( stu_id, course_id ) )");
     ret += sqlite3_exec(sql_db, sql, NULL, NULL, NULL);
     printf("Data tables initialized. Returned %d.\n", ret);
     return ret; // If not 0, failed

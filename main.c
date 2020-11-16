@@ -182,10 +182,12 @@ void manage_course()
         puts("3. 修改一门课程");
         puts("4. 查看所有课程信息");
         puts("5. 操作某课程选课信息");
+        puts("0. 返回上一级");
         char op = wait_option();
         switch (op)
         {
         case '1':
+        {
             entry_course *course1 = (entry_course *)malloc(sizeof(entry_course));
             course1->next = NULL;
 
@@ -235,7 +237,7 @@ void manage_course()
                     course1->hours = hours1;
             }
 
-            double credit1 = -1.0;
+            float credit1 = -1.0;
             while (credit1 < 0)
             {
                 puts("输入课程学分：");
@@ -262,7 +264,9 @@ void manage_course()
             else
                 puts("添加失败！");
             break;
+        }
         case '2':
+        {
             int id2;
             puts("输入将要删除的课程ID：");
             scanf("%d", &id2);
@@ -273,12 +277,17 @@ void manage_course()
                 scanf("%d", &id2);
             }
             puts("删除中...");
+            char sql[1024] = {0};
+            sprintf(sql, "delete from tb_selection where course_id=%d", id2);
+            db_exec(sql, NULL, NULL);
             if (course_delete(id2) == 1)
                 puts("删除成功！");
             else
                 puts("删除失败！");
             break;
+        }
         case '3':
+        {
             int id3;
             puts("输入将要修改的课程ID：");
             scanf("%d", &id3);
@@ -325,28 +334,120 @@ void manage_course()
             if (hours3 >= 0)
                 c3->hours = hours3;
 
-            double credit3 = -1.0;
+            float credit3 = -1.0;
             puts("输入课程学分（负数表示不修改）：");
             scanf("%f", &credit3);
             if (credit3 >= 0)
                 c3->credit = credit3;
 
             puts("修改中...");
-            char sql[1024] = {0};
-            
+            char sql2[1024] = {0};
+            sprintf(sql2, "update tb_selection set course_id=%d where course_id=%d;", new_id3, c3->id);
+            db_exec(sql2, NULL, NULL);
             if (1 == course_edit(id3, c3))
                 puts("修改成功！");
             else
                 puts("修改失败！");
+            break;
+        }
         case '4':
+        {
             entry_course *c4 = course_select_all();
             puts(SPLINE_2);
             while (c4)
             {
-                printf("%s(%d) %s %d %.1f %d", c4->name, c4->id, c4->type, c4->hours, c4->credit, c4->students_limit);
+                printf("%s(%d) %s %d学时 %.1f学分 人数限制%d\n", c4->name, c4->id, c4->type, c4->hours, c4->credit, c4->students_limit);
                 c4 = c4->next;
             }
+            puts(SPLINE_2);
             break;
+        }
+        case '0':
+            flag = 0;
+            break;
+        case '5':
+        {
+            puts(SPLINE_2);
+            entry_course *c5 = NULL;
+            while (!c5)
+            {
+                puts("输入课程ID：");
+                int id5;
+                scanf("%d", &id5);
+                c5 = course_select(id5);
+            }
+            puts(SPLINE_2);
+            printf("%s(%d) %s %d学时 %.1f学分 人数限制%d\n", c5->name, c5->id, c5->type, c5->hours, c5->credit, c5->students_limit);
+            char flag2 = 1;
+            while (flag2)
+            {
+                puts(SPLINE_2);
+                puts("你要做什么？");
+                puts("1. 查看该课程已选学生列表");
+                puts("2. 为一名学生选报该该课程");
+                puts("3. 从已选列表中删除一名学生");
+                puts("0. 返回上一级");
+                char op = wait_option();
+                switch (op)
+                {
+                case '1':
+                {
+                    course_info *c5i = get_all_courses_info();
+                    while (c5i && c5i->id != c5->id)
+                        c5i = c5i->next;
+                    entry_student *now = c5i->students;
+                    puts(SPLINE_2);
+                    while (now)
+                    {
+                        printf("%s(%d)\n", now->name, now->id);
+                        now = now->next;
+                    }
+                    break;
+                }
+                case '2':
+                    puts("输入该学生的ID：");
+                    int idd;
+                    scanf("%d", &idd);
+                    if (!student_select_by_id(idd))
+                    {
+                        puts("该学生不存在！");
+                    }
+                    else
+                    {
+                        puts("添加中...");
+                        entry_selection s;
+                        s.stu_id = idd;
+                        s.course_id = c5->id;
+                        if (selection_insert(&s))
+                            puts("添加成功！");
+                        else
+                            puts("添加失败！");
+                    }
+                    break;
+                case '3':
+                    puts("输入该学生的ID：");
+                    int idd2;
+                    scanf("%d", &idd2);
+                    if (!student_select_by_id(idd2))
+                    {
+                        puts("该学生不存在！");
+                    }
+                    else
+                    {
+                        puts("删除中...");
+                        if (selection_delete(idd2, c5->id))
+                            puts("删除成功！");
+                        else
+                            puts("删除失败！");
+                    }
+                    break;
+                case '0':
+                    flag2 = 0;
+                    break;
+                }
+            }
+            break;
+        }
         }
     }
 }
