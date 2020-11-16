@@ -173,4 +173,180 @@ void manage_student()
 
 void manage_course()
 {
+    char flag = 1;
+    while (flag)
+    {
+        puts(SPLINE_1);
+        puts("1. 添加新课程");
+        puts("2. 删除一门课程");
+        puts("3. 修改一门课程");
+        puts("4. 查看所有课程信息");
+        puts("5. 操作某课程选课信息");
+        char op = wait_option();
+        switch (op)
+        {
+        case '1':
+            entry_course *course1 = (entry_course *)malloc(sizeof(entry_course));
+            course1->next = NULL;
+
+            int id1 = 0;
+            while (id1 <= 0)
+            {
+                puts("输入课程ID：");
+                scanf("%d", &id1);
+                if (course_select(id1) != NULL)
+                    puts("课程ID已存在！");
+                else if (id1 <= 0)
+                    puts("课程ID不合法！");
+                else
+                    course1->id = id1;
+            }
+
+            char name1[1024] = {0};
+            while (strlen(name1) <= 0)
+            {
+                puts("输入课程名称：");
+                scanf("%s", name1);
+                if (strlen(name1) <= 0)
+                    puts("课程名称至少包含一个字符！");
+                else
+                    course1->name = name1;
+            }
+
+            char type1[1024] = {0};
+            while (strlen(type1) <= 0)
+            {
+                puts("输入课程性质：");
+                scanf("%s", type1);
+                if (strlen(type1) <= 0)
+                    puts("课程性质至少包含一个字符！");
+                else
+                    course1->type = type1;
+            }
+
+            int hours1 = -1;
+            while (hours1 < 0)
+            {
+                puts("输入课程学时：");
+                scanf("%d", &hours1);
+                if (hours1 < 0)
+                    puts("课程学时不能为负数！");
+                else
+                    course1->hours = hours1;
+            }
+
+            double credit1 = -1.0;
+            while (credit1 < 0)
+            {
+                puts("输入课程学分：");
+                scanf("%f", &credit1);
+                if (credit1 < 0)
+                    puts("课程学分不能为负数！");
+                else
+                    course1->credit = credit1;
+            }
+
+            int limit1 = -1;
+            while (limit1 < 0)
+            {
+                puts("输入课程人数限制：");
+                scanf("%d", &limit1);
+                if (limit1 < 0)
+                    puts("课程人数限制不能为负数！");
+                else
+                    course1->students_limit = limit1;
+            }
+            puts("添加中...");
+            if (course_insert(course1) == 1)
+                puts("添加成功！");
+            else
+                puts("添加失败！");
+            break;
+        case '2':
+            int id2;
+            puts("输入将要删除的课程ID：");
+            scanf("%d", &id2);
+            while (course_select(id2) == NULL)
+            {
+                puts("课程不存在！");
+                puts("输入将要删除的课程ID：");
+                scanf("%d", &id2);
+            }
+            puts("删除中...");
+            if (course_delete(id2) == 1)
+                puts("删除成功！");
+            else
+                puts("删除失败！");
+            break;
+        case '3':
+            int id3;
+            puts("输入将要修改的课程ID：");
+            scanf("%d", &id3);
+            entry_course *c3;
+            while ((c3 = course_select(id3)) == NULL)
+            {
+                puts("课程不存在！");
+                puts("输入将要修改的课程ID：");
+                scanf("%d", &id3);
+            }
+            int new_id3 = 0;
+            while (1)
+            {
+                puts("输入课程的新ID（0表示不修改）：");
+                scanf("%d", &new_id3);
+                if (course_select(new_id3) != NULL)
+                    puts("课程ID已存在！");
+                else if (new_id3 < 0)
+                    puts("课程ID不合法！");
+                else if (new_id3 == 0)
+                    break;
+                else
+                {
+                    c3->id = new_id3;
+                    break;
+                }
+            }
+
+            char name3[1024] = {0};
+            puts("输入新的课程名称（留空表示不修改）：");
+            scanf("%s", name3);
+            if (strlen(name3) != 0)
+                c3->name = name3;
+
+            char type3[1024] = {0};
+            puts("输入课程性质（留空表示不修改）：");
+            scanf("%s", type3);
+            if (strlen(type3) != 0)
+                c3->type = type3;
+
+            int hours3 = -1;
+            puts("输入课程学时（负数表示不修改）：");
+            scanf("%d", &hours3);
+            if (hours3 >= 0)
+                c3->hours = hours3;
+
+            double credit3 = -1.0;
+            puts("输入课程学分（负数表示不修改）：");
+            scanf("%f", &credit3);
+            if (credit3 >= 0)
+                c3->credit = credit3;
+
+            puts("修改中...");
+            char sql[1024] = {0};
+            
+            if (1 == course_edit(id3, c3))
+                puts("修改成功！");
+            else
+                puts("修改失败！");
+        case '4':
+            entry_course *c4 = course_select_all();
+            puts(SPLINE_2);
+            while (c4)
+            {
+                printf("%s(%d) %s %d %.1f %d", c4->name, c4->id, c4->type, c4->hours, c4->credit, c4->students_limit);
+                c4 = c4->next;
+            }
+            break;
+        }
+    }
 }
